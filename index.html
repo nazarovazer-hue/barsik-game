@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Барсик на Ёлке: 9 жизней до праздника</title>
+    <style>
+        :root {
+            --bks-blue: #1a73e8;
+            --bks-dark-blue: #0d47a1;
+            --bks-light-blue: #4285f4;
+            --bks-gradient: linear-gradient(135deg, var(--bks-blue) 0%, var(--bks-dark-blue) 100%);
+            --bks-gradient-light: linear-gradient(135deg, var(--bks-light-blue) 0%, var(--bks-blue) 100%);
+            --text-light: #ffffff;
+            --text-dark: #202124;
+            --success: #34a853;
+            --error: #ea4335;
+            --warning: #fbbc05;
+            --bg-light: #f8f9ff;
+            --shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
+            --tree-green: #188038;
+            --tree-light-green: #34a853;
+            --ornament-red: #d93025;
+            --ornament-gold: #fbbc05;
+            --ornament-blue: #4285f4;
+            --cat-blue: #4285f4;
+            --cat-light-blue: #8ab4f8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Google Sans', 'Roboto', 'Segoe UI', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 15% 25%, rgba(26, 115, 232, 0.08) 0%, transparent 25%),
+                radial-gradient(circle at 85% 75%, rgba(13, 71, 161, 0.08) 0%, transparent 25%);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        /* Хедер в стиле Google */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0 25px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #dadce0;
+        }
+        
+        .logo-text {
+            font-size: 28px;
+            font-weight: 500;
+            color: var(--bks-blue);
+            display: flex;
+            align-items: center;
+            letter-spacing: -0.5px;
+        }
+        
+        .logo-cat {
+            font-size: 32px;
+            margin-right: 12px;
+        }
+        
+        .score-display {
+            background: white;
+            color: var(--bks-blue);
+            padding: 8px 20px;
+            border-radius: 24px;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid #dadce0;
+        }
+        
+        .lives-count {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 2px;
+            color: var(--bks-dark-blue);
+        }
+        
+        /* Экраны игры */
+        .screen {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+            border: 1px solid #dadce0;
+        }
+        
+        .screen.active {
+            display: block;
+            animation: slideIn 0.4s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            color: var(--bks-dark-blue);
+            margin-bottom: 16px;
+            font-size: 36px;
+            font-weight: 500;
+            letter-spacing: -0.5px;
+        }
+        
+        h2 {
+            color: var(--bks-blue);
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 500;
+        }
+        
+        .description {
+            color: #5f6368;
+            margin-bottom: 32px;
+            line-height: 1.6;
+            font-size: 16px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Кнопки в стиле Material */
+        .btn {
+            background: var(--bks-gradient);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(26, 115, 232, 0.25);
+            margin: 8px;
+            min-width: 180px;
+            letter-spacing: 0.25px;
+            text-transform: none;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(26, 115, 232, 0.25);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--bks-blue);
+            border: 1px solid #dadce0;
+        }
+        
+        /* Раунд 1: Игровое поле */
+        .game-container {
+            width: 100%;
+            height: 500px;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            margin: 24px 0;
+            background: linear-gradient(180deg, #0d47a1 0%, #1a73e8 100%);
+            border: 3px solid var(--tree-green);
+            box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tree {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 400px;
+            background: linear-gradient(90deg, var(--tree-green), var(--tree-light-green));
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            z-index: 1;
+        }
+        
+        .tree::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+        
+        .tree-branch {
+            position: absolute;
+            background: #5d4037;
+            border-radius: 8px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+            z-index: 2;
+        }
+        
+        .cat-character {
+            position: absolute;
+            font-size: 56px;
+            z-index: 30;
+            transition: all 0.2s ease-out;
+            filter: drop-shadow(3px 3px 5px rgba(0,0,0,0.4));
+            transform-origin: center;
+        }
+        
+        .ornament {
+            position: absolute;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.15s;
+            user-select: none;
+            z-index: 20;
+            transform-origin: center;
+            border: 2px solid white;
+        }
+        
+        .ornament.fun {
+            background: radial-gradient(circle at 30% 30%, var(--ornament-gold), #e8710a);
+            color: white;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .ornament.wire {
+            background: radial-gradient(circle at 30% 30%, var(--ornament-red), #8b0000);
+            color: white;
+            border: 2px solid #ffcccb;
+            animation: dangerPulse 1.5s ease-in-out infinite;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 20px 0;
+        }
+        
+        .control-btn {
+            background: white;
+            color: var(--bks-blue);
+            border: 1px solid #dadce0;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
+        }
+        
+        .control-btn:hover {
+            background: var(--bks-gradient);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .timer-display {
+            font-size: 52px;
+            font-weight: bold;
+            color: var(--bks-dark-blue);
+            margin: 20px 0;
+            text-shadow: 0 2px 8px rgba(26, 115, 232, 0.2);
+            font-family: 'Google Sans', sans-serif;
+        }
+        
+        .round-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            font-size: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            background: rgba(26, 115, 232, 0.08);
+            padding: 12px 20px;
+            border-radius: 12px;
+            min-width: 140px;
+            margin: 8px;
+            border: 1px solid #dadce0;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 500;
+            color: var(--bks-dark-blue);
+        }
+        
+        /* Раунд 2: Вопросы */
+        .question-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: left;
+            border-left: 6px solid var(--bks-blue);
+            box-shadow: var(--shadow);
+            border: 1px solid #dadce0;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        .option-btn {
+            background: white;
+            border: 1px solid #dadce0;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+        }
+        
+        .option-btn:hover {
+            border-color: var(--bks-light-blue);
+            background: rgba(66, 133, 244, 0.04);
+        }
+        
+        .option-btn.selected {
+            border-color: var(--bks-blue);
+            background: rgba(66, 133, 244, 0.1);
+        }
+        
+        .option-btn.correct {
+            border-color: var(--success);
+            background: rgba(52, 168, 83, 0.1);
+        }
+        
+        .option-btn.incorrect {
+            border-color: var(--error);
+            background: rgba(234, 67, 53, 0.1);
+        }
+        
+        .question-counter {
+            color: var(--bks-blue);
+            font-weight: 500;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        /* Иллюстрация кота */
+        .cat-illustration {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            position: relative;
+        }
+        
+        .cat-illustration svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+        }
+        
+        .cat-body {
+            fill: var(--cat-blue);
+            stroke: #1a56c9;
+            stroke-width: 2;
+        }
+        
+        .cat-light {
+            fill: var(--cat-light-blue);
+        }
+        
+        .cat-eye {
+            fill: white;
+        }
+        
+        .cat-pupil {
+            fill: #1a237e;
+        }
+        
+        .cat-nose {
+            fill: #ff8a80;
+        }
+        
+        .cat-mouth {
+            fill: none;
+            stroke: #1a237e;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+        }
+        
+        .cat-whisker {
+            fill: none;
+            stroke: #1a237e;
+            stroke-width: 1;
+            stroke-linecap: round;
+        }
+        
+        .bowl {
+            fill: #fbbc05;
+            stroke: #e8710a;
+            stroke-width: 2;
+        }
+        
+        .bowl-inside {
+            fill: #f5f5f5;
+        }
+        
+        .hungry-text {
+            font-size: 24px;
+            color: #ea4335;
+            margin-top: 10px;
+            font-weight: 500;
+            animation: hungryPulse 2s infinite;
+        }
+        
+        @keyframes hungryPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        /* Экран результатов */
+        .result-rank {
+            font-size: 48px;
+            font-weight: 500;
+            color: var(--bks-dark-blue);
+            margin: 24px 0;
+            letter-spacing: -0.5px;
+        }
+        
+        .rank-description {
+            font-size: 16px;
+            color: #5f6368;
+            margin-bottom: 32px;
+            line-height: 1.6;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .result-details {
+            display: flex;
+            justify-content: space-around;
+            margin: 32px 0;
+            flex-wrap: wrap;
+        }
+        
+        .detail-box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 10px;
+            min-width: 160px;
+            box-shadow: var(--shadow);
+            border: 1px solid #dadce0;
+        }
+        
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 24px 0;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            background: #f8f9fa;
+            border: 1px solid #dadce0;
+            border-radius: 24px;
+            padding: 12px 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-size: 15px;
+        }
+        
+        .share-btn:hover {
+            background: #f1f3f4;
+        }
+        
+        .product-cta {
+            background: rgba(26, 115, 232, 0.04);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 32px 0;
+            border-left: 6px solid var(--bks-blue);
+            border: 1px solid #dadce0;
+        }
+        
+        .cta-links {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 20px;
+        }
+        
+        .cta-link {
+            display: block;
+            background: white;
+            color: var(--bks-blue);
+            padding: 12px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            border: 1px solid var(--bks-blue);
+            transition: all 0.2s;
+            font-size: 15px;
+        }
+        
+        .cta-link:hover {
+            background: var(--bks-gradient);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* Прогресс бар */
+        .progress-container {
+            height: 8px;
+            background: #f1f3f4;
+            border-radius: 4px;
+            margin: 24px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--bks-gradient);
+            width: 0%;
+            transition: width 0.5s ease-out;
+        }
+        
+        /* Индикатор жизней */
+        .lives-container {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }
+        
+        .life {
+            width: 32px;
+            height: 32px;
+            background: var(--bks-gradient);
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .life.lost {
+            background: #f1f3f4;
+            color: #9aa0a6;
+        }
+        
+        /* Правила игры */
+        .rules-box {
+            background: rgba(26, 115, 232, 0.04);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            border: 1px solid #dadce0;
+        }
+        
+        .rules-list {
+            margin: 16px 0 16px 24px;
+        }
+        
+        .rules-list li {
+            margin-bottom: 12px;
+            line-height: 1.5;
+            color: #5f6368;
+        }
+        
+        /* Анимации */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        @keyframes dangerPulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 4px 12px rgba(234, 67, 53, 0.4);
+            }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 6px 20px rgba(234, 67, 53, 0.6);
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        .floating {
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            10%, 30%, 50%, 70%, 90% { transform: rotate(-5deg); }
+            20%, 40%, 60%, 80% { transform: rotate(5deg); }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes electric {
+            0%, 100% { 
+                transform: scale(1);
+                filter: brightness(1);
+            }
+            25% { 
+                transform: scale(1.1);
+                filter: brightness(1.5) hue-rotate(60deg);
+            }
+            50% { 
+                transform: scale(1);
+                filter: brightness(1);
+            }
+            75% { 
+                transform: scale(1.1);
+                filter: brightness(1.5) hue-rotate(60deg);
+            }
+        }
+        
+        .electric {
+            animation: electric 0.3s ease;
+        }
+        
+        @keyframes jump {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-40px); }
+        }
+        
+        .jump {
+            animation: jump 0.4s ease-out;
+        }
+        
+        @keyframes fall {
+            0% { transform: translateY(-100px); opacity: 1; }
+            100% { transform: translateY(500px); opacity: 0; }
+        }
+        
+        .falling {
+            animation: fall 1.5s linear forwards;
+        }
+        
+        @keyframes collect {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        
+        .collect {
+            animation: collect 0.3s ease-out forwards;
+        }
+        
+        @keyframes catSad {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .cat-sad {
+            animation: catSad 2s ease-in-out infinite;
+        }
+        
+        /* Мобильная адаптация */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .screen {
+                padding: 24px 16px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            h2 {
+                font-size: 24px;
+            }
+            
+            .game-container {
+                height: 400px;
+            }
+            
+            .btn {
+                min-width: 160px;
+                padding: 12px 24px;
+                font-size: 15px;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+            
+            .logo-text {
+                font-size: 24px;
+            }
+            
+            .cat-character {
+                font-size: 48px;
+            }
+            
+            .ornament {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            
+            .control-btn {
+                width: 56px;
+                height: 56px;
+                font-size: 20px;
+            }
+            
+            .timer-display {
+                font-size: 40px;
+            }
+            
+            .cat-illustration {
+                width: 160px;
+                height: 160px;
+            }
+            
+            .hungry-text {
+                font-size: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .timer-display {
+                font-size: 36px;
+            }
+            
+            .round-stats {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .share-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .share-btn {
+                width: 100%;
+                max-width: 280px;
+                justify-content: center;
+            }
+            
+            .controls {
+                gap: 12px;
+            }
+            
+            .control-btn {
+                width: 52px;
+                height: 52px;
+                font-size: 18px;
+            }
+            
+            .cat-illustration {
+                width: 140px;
+                height: 140px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-text">
+                <span class="logo-cat">🐱</span> Барсик на Ёлке: 9 жизней до праздника
+            </div>
+            <div class="score-display">
+                <div>Жизней:</div>
+                <div class="lives-count" id="livesCount">9</div>
+            </div>
+        </div>
+
+        <!-- Прогресс игры -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <!-- Экран 1: Старт -->
+        <div class="screen active" id="screenStart">
+            <h1>🐱 Барсик на Ёлке: 9 жизней до праздника!</h1>
+            <p class="description">
+                Привет! Я кот Барсик, и до Нового года осталась всего неделя! 
+                Мой хозяин трейдер из БКС поставил ёлку, и я просто не могу удержаться 
+                от соблазна залезть на неё. Помоги мне добраться до верхушки, 
+                но будь осторожен — я уже царапнул гирлянду и получил удар током!
+            </p>
+            
+            <div class="rules-box">
+                <h3>📋 Правила игры:</h3>
+                <ul class="rules-list">
+                    <li>У Барсика есть <strong>9 жизней</strong>, которые отображаются сверху</li>
+                    <li><strong>Раунд 1:</strong> Барсик карабкается по ёлке. Нажимай на <strong>ценные игрушки</strong> (валюты), чтобы заработать очки</li>
+                    <li>Избегай <strong>гирлянд</strong> — если царапнешь, получишь удар током и потеряешь жизнь!</li>
+                    <li>Нужно успеть за 60 секунд, иначе ёлка упадёт!</li>
+                </ul>
+            </div>
+            
+            <div class="floating">
+                <button class="btn" onclick="startGame()">Начать приключение 🎄</button>
+            </div>
+        </div>
+        
+        <!-- Экран 2: Ёлка -->
+        <div class="screen" id="screenTree">
+            <h2>Раунд 1: Прыгаем по ёлке!</h2>
+            <p class="description">
+                Барсик прыгает с ветки на ветку! Кликай на <strong>ценные игрушки</strong> (валюты), чтобы заработать очки.<br>
+                Избегай <strong>гирлянд</strong> — если царапнешь, получишь удар током и потеряешь жизнь!<br>
+                Нужно успеть за 60 секунд, иначе ёлка упадёт!
+            </p>
+            
+            <div class="timer-display" id="timerTree">60</div>
+            
+            <!-- Индикатор жизней -->
+            <div class="lives-container" id="livesContainer"></div>
+            
+            <div class="game-container" id="gameContainer">
+                <!-- Ветки и объекты генерируются здесь -->
+            </div>
+            
+            <div class="controls">
+                <button class="control-btn" id="leftBtn">←</button>
+                <button class="control-btn" id="jumpBtn">↑</button>
+                <button class="control-btn" id="rightBtn">→</button>
+            </div>
+            
+            <div class="round-stats">
+                <div class="stat">
+                    <div class="stat-value" id="funOrnaments">0</div>
+                    <div>Ценные игрушки</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="wiresHit">0</div>
+                    <div>Ударов током</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="levelTree">1</div>
+                    <div>Уровень</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Экран 3: Правила второго раунда -->
+        <div class="screen" id="screenRules2">
+            <h2>Раунд 2: Барсик "умирает" с голоду!</h2>
+            <p class="description">
+                После такого напряжения на ёлке Барсик драматично "умирает" от голода (как всегда перед хозяином)!<br>
+                <strong>Аналитики БКС сделали прогноз на 2026 год</strong> — угадай, какой вариант верный!
+            </p>
+            
+            <!-- Иллюстрация голодного кота -->
+            <div class="cat-illustration cat-sad">
+                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Тело кота -->
+                    <ellipse cx="100" cy="100" rx="60" ry="40" class="cat-body"/>
+                    
+                    <!-- Голова -->
+                    <circle cx="100" cy="70" r="25" class="cat-body"/>
+                    
+                    <!-- Уши -->
+                    <path d="M85,50 L80,30 L95,45 Z" class="cat-body"/>
+                    <path d="M115,50 L120,30 L105,45 Z" class="cat-body"/>
+                    
+                    <!-- Глаза -->
+                    <circle cx="90" cy="65" r="6" class="cat-eye"/>
+                    <circle cx="110" cy="65" r="6" class="cat-eye"/>
+                    
+                    <!-- Зрачки (смотрят в сторону миски) -->
+                    <circle cx="93" cy="65" r="3" class="cat-pupil"/>
+                    <circle cx="113" cy="65" r="3" class="cat-pupil"/>
+                    
+                    <!-- Нос -->
+                    <circle cx="100" cy="75" r="3" class="cat-nose"/>
+                    
+                    <!-- Рот (грустный) -->
+                    <path d="M100,80 Q105,85 110,80" class="cat-mouth"/>
+                    
+                    <!-- Усы -->
+                    <line x1="80" y1="70" x2="60" y2="65" class="cat-whisker"/>
+                    <line x1="80" y1="75" x2="60" y2="75" class="cat-whisker"/>
+                    <line x1="80" y1="80" x2="60" y2="85" class="cat-whisker"/>
+                    <line x1="120" y1="70" x2="140" y2="65" class="cat-whisker"/>
+                    <line x1="120" y1="75" x2="140" y2="75" class="cat-whisker"/>
+                    <line x1="120" y1="80" x2="140" y2="85" class="cat-whisker"/>
+                    
+                    <!-- Лапы -->
+                    <circle cx="80" cy="115" r="10" class="cat-body"/>
+                    <circle cx="120" cy="115" r="10" class="cat-body"/>
+                    
+                    <!-- Хвост -->
+                    <path d="M160,90 Q180,70 165,120 Q150,140 140,110" class="cat-body" fill="none" stroke-width="3"/>
+                    
+                    <!-- Миска -->
+                    <ellipse cx="100" cy="150" rx="40" ry="15" class="bowl"/>
+                    <ellipse cx="100" cy="145" rx="35" ry="10" class="bowl-inside"/>
+                    
+                    <!-- Ободок миски -->
+                    <ellipse cx="100" cy="140" rx="40" ry="8" class="bowl" stroke-width="3"/>
+                    
+                    <!-- Капелька слюны -->
+                    <path d="M100,85 Q102,90 104,85 Q106,95 108,90 Q110,100 112,95" fill="none" stroke="#4285f4" stroke-width="1.5" stroke-linecap="round" opacity="0.7">
+                        <animate attributeName="d" dur="2s" repeatCount="indefinite"
+                            values="M100,85 Q102,90 104,85 Q106,95 108,90 Q110,100 112,95;
+                                    M100,85 Q102,92 104,85 Q106,97 108,90 Q110,102 112,95;
+                                    M100,85 Q102,90 104,85 Q106,95 108,90 Q110,100 112,95"/>
+                    </path>
+                </svg>
+            </div>
+            
+            <div class="hungry-text">ХОЧУ ЕСТЬ! 🍗</div>
+            
+            <div class="rules-box">
+                <h3>📋 Правила второго раунда:</h3>
+                <ul class="rules-list">
+                    <li>Тебе предстоит ответить на <strong>3 вопроса</strong> от аналитиков БКС</li>
+                    <li>За каждый <strong>правильный ответ</strong> Барсик получит вкусняшку (+1 жизнь)</li>
+                    <li>За каждый <strong>неправильный ответ</strong> Барсик останется голодным (-1 жизнь)</li>
+                    <li>В конце Барсик сделает предсказание на 2026 год на основе твоих результатов</li>
+                </ul>
+            </div>
+            
+            <button class="btn" onclick="startRound2()">Ответить на вопросы 🐟</button>
+        </div>
+        
+        <!-- Экран 4: Вопросы -->
+        <div class="screen" id="screenQuestions">
+            <h2>Раунд 2: Вопросы от аналитиков БКС</h2>
+            <p class="description">
+                Аналитики БКС сделали прогноз на 2026 год — угадай, какой вариант верный!<br>
+                Помни: за правильный ответ — вкусняшка (+1 жизнь), за неправильный — голод (-1 жизнь).
+            </p>
+            
+            <div class="question-counter" id="questionCounter">Вопрос 1 из 3</div>
+            
+            <div class="question-box" id="questionBox">
+                <!-- Вопросы загружаются динамически -->
+            </div>
+            
+            <div id="questionFeedback" class="feedback"></div>
+            
+            <button class="btn" onclick="checkAnswer()" id="checkAnswerBtn" style="margin-top: 20px;">Ответить</button>
+        </div>
+        
+        <!-- Экран 5: Результаты -->
+        <div class="screen" id="screenResults">
+            <h2>Игра завершена!</h2>
+            
+            <div class="result-rank" id="finalRank">Прогноз от Барсика</div>
+            
+            <p class="rank-description" id="rankDescription">
+                Барсик доволен (или не очень) результатом и делает прогноз на следующий год!
+            </p>
+            
+            <div class="result-details">
+                <div class="detail-box">
+                    <div class="stat-value" id="finalLives">0</div>
+                    <div>Жизней сохранено</div>
+                </div>
+                <div class="detail-box">
+                    <div class="stat-value" id="totalFun">0</div>
+                    <div>Ценных игрушек</div>
+                </div>
+                <div class="detail-box">
+                    <div class="stat-value" id="correctAnswers">0</div>
+                    <div>Правильных ответов</div>
+                </div>
+            </div>
+            
+            <div class="product-cta">
+                <h3>Чувствуешь, как Барсик предсказывает твоё будущее?</h3>
+                <p>Аналитики БКС тоже умеют предсказывать — но не будущее, а тренды на рынке! 
+                   Начни инвестировать с БКС — открой брокерский счёт и получи доступ к мировым рынкам с умными прогнозами!</p>
+                
+                <div class="cta-links">
+                    <a href="https://bcs-express.ru/novosti-i-analitika/itogi-oprosa-investorov-bks" target="_blank" class="cta-link">
+                        📊 Посмотреть прогнозы аналитиков БКС
+                    </a>
+                    <a href="https://bcs.ru/open-account?bucket=B" target="_blank" class="cta-link">
+                        📈 Открыть счёт в БКС
+                    </a>
+                </div>
+            </div>
+            
+            <div class="share-buttons">
+                <button class="share-btn" onclick="shareResult()">
+                    📢 Поделиться результатом
+                </button>
+                <button class="btn" onclick="playAgain()">
+                    Играть снова 🐱
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Глобальные переменные игры
+        let gameState = {
+            lives: 9,
+            maxLives: 9,
+            score: 0,
+            currentScreen: 'start',
+            round1: { 
+                funOrnaments: 0,
+                wiresHit: 0,
+                level: 1,
+                speed: 3,
+                spawnInterval: 600,
+                timeLeft: 60,
+                ornaments: [],
+                catPosition: { x: 50, y: 350 },
+                catSpeed: 8,
+                branches: [],
+                gameActive: false,
+                scoreMultiplier: 1
+            },
+            round2: {
+                currentQuestion: 0,
+                selectedAnswer: null,
+                correctAnswers: 0,
+                questions: []
+            }
+        };
+        
+        // Ценные игрушки (валюты)
+        const funOrnaments = ['$', '€', '¥', '£', '₿', '₽', '¢', '₩', '₴', '₹', '₫', '₺'];
+        
+        // Гирлянды (опасные)
+        const wireOrnaments = ['💡', '🔌', '⚡', '⚠️', '🔥', '💥'];
+        
+        // Вопросы для второго раунда
+        const questions = [
+            {
+                question: 'Аналитики БКС прогнозируют рост какого актива в 2026 году?',
+                options: [
+                    'Криптовалюты — все побегут покупать биткоин',
+                    'Золото — классическая защита от неопределённости',
+                    'Акции IT-компаний — технологии правят миром',
+                    'Все варианты верны — диверсификация рулит'
+                ],
+                correct: 3,
+                explanation: 'Аналитики БКС рекомендуют диверсификацию — не класть все яйца в одну корзину!'
+            },
+            {
+                question: 'Что произойдёт с курсом рубля в 2026 году по прогнозам БКС?',
+                options: [
+                    'Укрепится на 15% — будем отдыхать за границей',
+                    'Останется стабильным — никаких сюрпризов',
+                    'Ослабнет на 10% — пора покупать валюту',
+                    'Кто его знает — даже коты не предскажут'
+                ],
+                correct: 2,
+                explanation: 'Аналитики БКС ожидают умеренное ослабление рубля — время задуматься о валютных вложениях.'
+            },
+            {
+                question: 'Какую инвестиционную стратегию рекомендуют аналитики БКС на 2026 год?',
+                options: [
+                    'Вложить всё в одну перспективную акцию',
+                    'Держать деньги под подушкой — надёжнее не бывает',
+                    'Регулярно инвестировать в индексные фонды',
+                    'Ждать, когда рынок упадёт до дна'
+                ],
+                correct: 2,
+                explanation: 'Аналитики БКС советуют регулярные инвестиции (DCA) — это снижает риски и дисциплинирует.'
+            }
+        ];
+        
+        // Предсказания от Барсика в зависимости от сохранённых жизней
+        const predictions = [
+            {
+                title: 'Год кошачьей лени',
+                description: 'Барсик видит: 2026 год будет годом отдыха и накопления сил. Рынки будут двигаться плавно, как кот по подоконнику. Идеальное время для обучения и формирования долгосрочного портфеля с БКС!',
+                minLives: 0,
+                maxLives: 2
+            },
+            {
+                title: 'Год мягких лапок',
+                description: 'По прогнозу Барсика: 2026 год будет стабильным и предсказуемым. Как кот, который аккуратно обходит все препятствия, ты сможешь достичь своих финансовых целей с помощью аналитики БКС.',
+                minLives: 3,
+                maxLives: 4
+            },
+            {
+                title: 'Год игривого настроения',
+                description: 'Барсик чувствует: 2026 год принесёт интересные возможности! Рынки будут активными, как котёнок с мячиком. Время для смелых, но продуманных решений с поддержкой экспертов БКС.',
+                minLives: 5,
+                maxLives: 6
+            },
+            {
+                title: 'Год охотничьих трофеев',
+                description: 'Барсик уверен: 2026 год будет удачным для решительных действий! Как опытный охотник, ты сможешь поймать выгодные возможности на рынке. С аналитикой БКС твои шансы на успех значительно выше!',
+                minLives: 7,
+                maxLives: 8
+            },
+            {
+                title: 'Год королевской поступи',
+                description: 'Барсик предсказывает: 2026 год будет триумфальным! Ты, как истинный повелитель финансовых джунглей, сможешь достичь всех поставленных целей. С БКС как надёжным партнёром, успех гарантирован!',
+                minLives: 9,
+                maxLives: 9
+            },
+            {
+                title: 'Год мудрого наблюдателя',
+                description: 'Барсик советует: в 2026 году будь внимательным, как кот у мышиной норки. Рынки предложат интересные возможности для тех, кто умеет ждать. С аналитикой БКС ты не пропустишь важные сигналы!',
+                minLives: 0,
+                maxLives: 9
+            },
+            {
+                title: 'Год стремительного прыжка',
+                description: 'Барсик чует: 2026 год будет временем быстрых решений! Как кот, прыгающий за солнечным зайчиком, нужно быть готовым к моментальным действиям. С БКС ты получишь все необходимые инструменты для успеха!',
+                minLives: 4,
+                maxLives: 7
+            },
+            {
+                title: 'Год уютного инвестирования',
+                description: 'Барсик рекомендует: 2026 год — время для комфортных и продуманных инвестиций. Как кот на тёплой батарее, выбирай надёжные и устойчивые стратегии с помощью аналитиков БКС.',
+                minLives: 2,
+                maxLives: 5
+            }
+        ];
+        
+        // Инициализация игры
+        function startGame() {
+            gameState.lives = 9;
+            gameState.score = 0;
+            
+            // Настройки первого раунда
+            gameState.round1 = { 
+                funOrnaments: 0,
+                wiresHit: 0,
+                level: 1,
+                speed: 3,
+                spawnInterval: 600,
+                timeLeft: 60,
+                ornaments: [],
+                catPosition: { x: 50, y: 350 },
+                catSpeed: 8,
+                branches: [],
+                gameActive: true,
+                scoreMultiplier: 1
+            };
+            
+            // Настройки второго раунда
+            gameState.round2 = {
+                currentQuestion: 0,
+                selectedAnswer: null,
+                correctAnswers: 0,
+                questions: [...questions]
+            };
+            
+            // Перемешиваем вопросы
+            shuffleArray(gameState.round2.questions);
+            
+            updateLivesDisplay();
+            showScreen('tree');
+            initRound1();
+        }
+        
+        // Перемешивание массива
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // Управление экранами
+        function showScreen(screenName) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            const screenId = `screen${screenName.charAt(0).toUpperCase() + screenName.slice(1)}`;
+            document.getElementById(screenId).classList.add('active');
+            
+            // Обновление прогресс-бара
+            const screens = ['start', 'tree', 'rules2', 'questions', 'results'];
+            const progress = (screens.indexOf(screenName) / (screens.length - 1)) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+        
+        // Обновление отображения жизней
+        function updateLivesDisplay() {
+            document.getElementById('livesCount').textContent = gameState.lives;
+            
+            const livesContainer = document.getElementById('livesContainer');
+            livesContainer.innerHTML = '';
+            
+            for (let i = 0; i < gameState.maxLives; i++) {
+                const life = document.createElement('div');
+                life.className = i < gameState.lives ? 'life' : 'life lost';
+                life.textContent = i < gameState.lives ? '❤️' : '💔';
+                livesContainer.appendChild(life);
+            }
+        }
+        
+        // ========== РАУНД 1: Ёлка ==========
+        let gameInterval;
+        let timerInterval;
+        let catElement;
+        let spawnTimer;
+        
+        function initRound1() {
+            const gameContainer = document.getElementById('gameContainer');
+            gameContainer.innerHTML = '';
+            
+            // Сброс статистики
+            gameState.round1.funOrnaments = 0;
+            gameState.round1.wiresHit = 0;
+            gameState.round1.level = 1;
+            gameState.round1.timeLeft = 60;
+            gameState.round1.ornaments = [];
+            gameState.round1.catPosition = { x: 50, y: 350 };
+            gameState.round1.branches = [];
+            gameState.round1.gameActive = true;
+            gameState.round1.scoreMultiplier = 1;
+            
+            // Обновляем счетчики
+            document.getElementById('funOrnaments').textContent = '0';
+            document.getElementById('wiresHit').textContent = '0';
+            document.getElementById('levelTree').textContent = '1';
+            document.getElementById('timerTree').textContent = '60';
+            
+            // Создаем елку
+            const tree = document.createElement('div');
+            tree.className = 'tree';
+            gameContainer.appendChild(tree);
+            
+            // Создаём ветки
+            createBranches();
+            
+            // Создаём кота
+            catElement = document.createElement('div');
+            catElement.className = 'cat-character';
+            catElement.id = 'catCharacter';
+            catElement.textContent = '🐱';
+            catElement.style.left = `${gameState.round1.catPosition.x}px`;
+            catElement.style.top = `${gameState.round1.catPosition.y}px`;
+            gameContainer.appendChild(catElement);
+            
+            // Назначаем обработчики кнопок
+            document.getElementById('leftBtn').onclick = () => moveCat(-1);
+            document.getElementById('rightBtn').onclick = () => moveCat(1);
+            document.getElementById('jumpBtn').onclick = () => jumpCat();
+            
+            // Обработчики клавиатуры
+            document.addEventListener('keydown', handleKeyDown);
+            
+            // Запускаем таймер
+            timerInterval = setInterval(() => {
+                if (!gameState.round1.gameActive) return;
+                
+                gameState.round1.timeLeft--;
+                document.getElementById('timerTree').textContent = gameState.round1.timeLeft;
+                
+                // Проверяем, не закончилось ли время
+                if (gameState.round1.timeLeft <= 0) {
+                    endRound1(true);
+                    return;
+                }
+                
+                // Повышаем уровень каждые 15 секунд
+                if (gameState.round1.timeLeft % 15 === 0 && gameState.round1.timeLeft < 60) {
+                    increaseLevel();
+                }
+            }, 1000);
+            
+            // Запускаем спавн объектов
+            spawnTimer = setInterval(() => {
+                if (!gameState.round1.gameActive) return;
+                createFallingObject();
+            }, gameState.round1.spawnInterval);
+            
+            // Запускаем игровой цикл
+            gameInterval = setInterval(gameLoop, 16); // ~60 FPS
+        }
+        
+        function createBranches() {
+            const gameContainer = document.getElementById('gameContainer');
+            
+            // Создаём 6 веток на разных уровнях
+            for (let i = 0; i < 6; i++) {
+                const branch = document.createElement('div');
+                branch.className = 'tree-branch';
+                const yPos = 320 - i * 50;
+                const xPos = 100 + (Math.random() * 400 - 200);
+                const width = 150 + Math.random() * 100;
+                
+                branch.style.left = `${xPos}px`;
+                branch.style.top = `${yPos}px`;
+                branch.style.width = `${width}px`;
+                branch.style.height = '12px';
+                
+                gameContainer.appendChild(branch);
+                gameState.round1.branches.push({
+                    element: branch,
+                    x: xPos,
+                    y: yPos,
+                    width: width
+                });
+            }
+        }
+        
+        function moveCat(direction) {
+            if (!gameState.round1.gameActive) return;
+            
+            // Двигаем кота по горизонтали
+            gameState.round1.catPosition.x += direction * gameState.round1.catSpeed;
+            
+            // Ограничиваем движение в пределах экрана
+            if (gameState.round1.catPosition.x < 20) gameState.round1.catPosition.x = 20;
+            if (gameState.round1.catPosition.x > 750) gameState.round1.catPosition.x = 750;
+            
+            // Обновляем позицию кота
+            catElement.style.left = `${gameState.round1.catPosition.x}px`;
+            
+            // Создаём игрушку с некоторой вероятностью
+            if (Math.random() < 0.2) {
+                createFallingObject();
+            }
+        }
+        
+        function jumpCat() {
+            if (!gameState.round1.gameActive) return;
+            
+            // Анимация прыжка
+            catElement.classList.add('jump');
+            setTimeout(() => {
+                catElement.classList.remove('jump');
+            }, 400);
+            
+            // Создаём игрушку с вероятностью
+            if (Math.random() < 0.3) {
+                createFallingObject();
+            }
+        }
+        
+        function handleKeyDown(e) {
+            if (!gameState.round1.gameActive) return;
+            
+            switch(e.key) {
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    moveCat(-1);
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    moveCat(1);
+                    break;
+                case 'ArrowUp':
+                case ' ':
+                case 'w':
+                case 'W':
+                    jumpCat();
+                    break;
+            }
+        }
+        
+        function createFallingObject() {
+            const gameContainer = document.getElementById('gameContainer');
+            
+            // Определяем тип объекта (60% ценные, 40% гирлянды)
+            const isFun = Math.random() < 0.6;
+            const emoji = isFun ? 
+                funOrnaments[Math.floor(Math.random() * funOrnaments.length)] : 
+                wireOrnaments[Math.floor(Math.random() * wireOrnaments.length)];
+            
+            const ornament = document.createElement('div');
+            ornament.className = isFun ? 'ornament fun' : 'ornament wire';
+            ornament.textContent = emoji;
+            ornament.dataset.type = isFun ? 'fun' : 'wire';
+            
+            // Позиционируем в случайном месте сверху
+            const xPos = 50 + Math.random() * 700;
+            ornament.style.left = `${xPos}px`;
+            ornament.style.top = '-50px';
+            
+            // Обработчик клика
+            ornament.onclick = function() {
+                handleOrnamentClick(ornament, isFun);
+            };
+            
+            gameContainer.appendChild(ornament);
+            gameState.round1.ornaments.push({
+                element: ornament,
+                type: isFun ? 'fun' : 'wire',
+                x: xPos,
+                y: -50,
+                speed: gameState.round1.speed + Math.random() * 2
+            });
+        }
+        
+        function gameLoop() {
+            if (!gameState.round1.gameActive) return;
+            
+            // Двигаем все падающие объекты
+            gameState.round1.ornaments.forEach((ornamentObj, index) => {
+                ornamentObj.y += ornamentObj.speed;
+                ornamentObj.element.style.top = `${ornamentObj.y}px`;
+                
+                // Немного раскачиваем из стороны в сторону
+                if (ornamentObj.type === 'fun') {
+                    ornamentObj.element.style.left = `${ornamentObj.x + Math.sin(ornamentObj.y / 30) * 10}px`;
+                }
+                
+                // Проверяем, достиг ли объект низа
+                if (ornamentObj.y > 550) {
+                    // Если объект упал мимо кота, удаляем его
+                    if (ornamentObj.element.parentNode) {
+                        ornamentObj.element.parentNode.removeChild(ornamentObj.element);
+                    }
+                    gameState.round1.ornaments.splice(index, 1);
+                }
+                
+                // Проверяем столкновение с котом
+                const catRect = {
+                    x: gameState.round1.catPosition.x,
+                    y: gameState.round1.catPosition.y,
+                    width: 56,
+                    height: 56
+                };
+                
+                const ornamentRect = {
+                    x: parseFloat(ornamentObj.element.style.left),
+                    y: ornamentObj.y,
+                    width: 44,
+                    height: 44
+                };
+                
+                if (checkCollision(catRect, ornamentRect)) {
+                    // Столкновение!
+                    handleOrnamentClick(ornamentObj.element, ornamentObj.type === 'fun');
+                    gameState.round1.ornaments.splice(index, 1);
+                }
+            });
+        }
+        
+        function checkCollision(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+        
+        function handleOrnamentClick(ornament, isFun) {
+            if (!gameState.round1.gameActive) return;
+            
+            ornament.style.pointerEvents = 'none';
+            
+            if (isFun) {
+                // Ценная игрушка
+                gameState.round1.funOrnaments++;
+                gameState.score += 100 * gameState.round1.scoreMultiplier;
+                document.getElementById('funOrnaments').textContent = gameState.round1.funOrnaments;
+                
+                ornament.classList.add('collect');
+                
+                // Вибрация на мобильных
+                if (navigator.vibrate && window.innerWidth <= 768) {
+                    navigator.vibrate(30);
+                }
+                
+                // Удаляем через 300 мс
+                setTimeout(() => {
+                    if (ornament.parentNode) ornament.parentNode.removeChild(ornament);
+                }, 300);
+                
+            } else {
+                // Гирлянда - удар током!
+                gameState.round1.wiresHit++;
+                gameState.lives = Math.max(0, gameState.lives - 1);
+                updateLivesDisplay();
+                
+                ornament.classList.add('electric');
+                catElement.classList.add('shake');
+                
+                // Вибрация на мобильных
+                if (navigator.vibrate && window.innerWidth <= 768) {
+                    navigator.vibrate(200);
+                }
+                
+                // Анимация удара током
+                setTimeout(() => {
+                    catElement.classList.remove('shake');
+                }, 500);
+                
+                // Удаляем гирлянду через 500 мс
+                setTimeout(() => {
+                    if (ornament.parentNode) ornament.parentNode.removeChild(ornament);
+                }, 500);
+                
+                // Проверяем, не закончились ли жизни
+                if (gameState.lives <= 0) {
+                    endRound1(false);
+                    return;
+                }
+            }
+        }
+        
+        function increaseLevel() {
+            gameState.round1.level++;
+            gameState.round1.speed += 0.5;
+            gameState.round1.spawnInterval = Math.max(300, gameState.round1.spawnInterval - 100);
+            gameState.round1.scoreMultiplier += 0.2;
+            
+            document.getElementById('levelTree').textContent = gameState.round1.level;
+            
+            // Обновляем интервал спавна
+            clearInterval(spawnTimer);
+            spawnTimer = setInterval(() => {
+                if (!gameState.round1.gameActive) return;
+                createFallingObject();
+            }, gameState.round1.spawnInterval);
+            
+            // Визуальный эффект
+            catElement.classList.add('shake');
+            setTimeout(() => {
+                catElement.classList.remove('shake');
+            }, 500);
+        }
+        
+        function endRound1(timeout = false) {
+            // Останавливаем игровой цикл
+            gameState.round1.gameActive = false;
+            clearInterval(gameInterval);
+            clearInterval(timerInterval);
+            clearInterval(spawnTimer);
+            
+            // Удаляем обработчики клавиатуры
+            document.removeEventListener('keydown', handleKeyDown);
+            
+            // Если время вышло, отнимаем 3 жизни (но не больше, чем есть)
+            if (timeout) {
+                const livesToLose = Math.min(3, gameState.lives);
+                gameState.lives -= livesToLose;
+                updateLivesDisplay();
+                
+                // Анимация падения кота
+                catElement.style.transform = 'rotate(180deg)';
+                catElement.style.top = '450px';
+                catElement.style.transition = 'all 1s ease-out';
+            }
+            
+            // Переходим к правилам второго раунда
+            setTimeout(() => {
+                showScreen('rules2');
+            }, 1500);
+        }
+        
+        // ========== РАУНД 2: Вопросы ==========
+        function startRound2() {
+            showScreen('questions');
+            loadQuestion();
+        }
+        
+        function loadQuestion() {
+            const question = gameState.round2.questions[gameState.round2.currentQuestion];
+            const questionBox = document.getElementById('questionBox');
+            
+            // Сбрасываем выбранный ответ
+            gameState.round2.selectedAnswer = null;
+            
+            // Обновляем счетчик вопросов
+            document.getElementById('questionCounter').textContent = 
+                `Вопрос ${gameState.round2.currentQuestion + 1} из 3`;
+            
+            // Создаем HTML для вопроса
+            questionBox.innerHTML = `
+                <h3>${question.question}</h3>
+                <div class="options-grid" id="optionsGrid">
+                    ${question.options.map((option, index) => `
+                        <div class="option-btn" data-index="${index}">
+                            ${option}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            // Сбрасываем обратную связь
+            document.getElementById('questionFeedback').innerHTML = '';
+            document.getElementById('questionFeedback').className = 'feedback';
+            document.getElementById('questionFeedback').style.display = 'none';
+            
+            // Сбрасываем текст кнопки
+            document.getElementById('checkAnswerBtn').textContent = 'Ответить';
+            document.getElementById('checkAnswerBtn').disabled = false;
+            document.getElementById('checkAnswerBtn').onclick = checkAnswer;
+            
+            // Добавляем обработчики для вариантов ответа
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Снимаем выделение со всех вариантов
+                    document.querySelectorAll('.option-btn').forEach(b => {
+                        b.classList.remove('selected');
+                    });
+                    
+                    // Выделяем выбранный вариант
+                    this.classList.add('selected');
+                    gameState.round2.selectedAnswer = parseInt(this.dataset.index);
+                });
+            });
+        }
+        
+        function checkAnswer() {
+            if (gameState.round2.selectedAnswer === null) {
+                alert('Барсик ждёт твой ответ! Выбери вариант!');
+                return;
+            }
+            
+            const question = gameState.round2.questions[gameState.round2.currentQuestion];
+            const isCorrect = gameState.round2.selectedAnswer === question.correct;
+            
+            // Подсвечиваем правильные/неправильные ответы
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                const index = parseInt(btn.dataset.index);
+                btn.classList.remove('selected');
+                
+                if (index === question.correct) {
+                    btn.classList.add('correct');
+                } else if (index === gameState.round2.selectedAnswer && !isCorrect) {
+                    btn.classList.add('incorrect');
+                }
+                
+                // Отключаем клики
+                btn.style.pointerEvents = 'none';
+            });
+            
+            // Показываем обратную связь
+            const feedbackEl = document.getElementById('questionFeedback');
+            if (isCorrect) {
+                feedbackEl.innerHTML = `<strong>Правильно!</strong> ${question.explanation}<br>Барсик получает вкусняшку! (+1 жизнь)`;
+                feedbackEl.className = 'feedback correct';
+                gameState.lives = Math.min(gameState.maxLives, gameState.lives + 1);
+                gameState.round2.correctAnswers++;
+            } else {
+                feedbackEl.innerHTML = `<strong>Увы!</strong> ${question.explanation}<br>Барсик остаётся голодным! (-1 жизнь)`;
+                feedbackEl.className = 'feedback incorrect';
+                gameState.lives = Math.max(0, gameState.lives - 1);
+            }
+            
+            feedbackEl.style.display = 'block';
+            updateLivesDisplay();
+            
+            // Меняем текст кнопки
+            document.getElementById('checkAnswerBtn').textContent = 'Далее';
+            document.getElementById('checkAnswerBtn').disabled = false;
+            document.getElementById('checkAnswerBtn').onclick = nextQuestion;
+        }
+        
+        function nextQuestion() {
+            gameState.round2.currentQuestion++;
+            
+            if (gameState.round2.currentQuestion < gameState.round2.questions.length) {
+                loadQuestion();
+            } else {
+                // Все вопросы пройдены, показываем результаты
+                showScreen('results');
+                displayFinalResults();
+            }
+        }
+        
+        // ========== ЭКРАН РЕЗУЛЬТАТОВ ==========
+        function displayFinalResults() {
+            // Обновляем статистику
+            document.getElementById('finalLives').textContent = gameState.lives;
+            document.getElementById('totalFun').textContent = gameState.round1.funOrnaments;
+            document.getElementById('correctAnswers').textContent = gameState.round2.correctAnswers;
+            
+            // Определяем предсказание
+            let suitablePredictions = predictions.filter(p => 
+                gameState.lives >= p.minLives && gameState.lives <= p.maxLives
+            );
+            
+            // Если есть подходящие предсказания, выбираем случайное
+            let prediction;
+            if (suitablePredictions.length > 0) {
+                prediction = suitablePredictions[Math.floor(Math.random() * suitablePredictions.length)];
+            } else {
+                // Если по какой-то причине не нашли подходящее, берём первое
+                prediction = predictions[0];
+            }
+            
+            document.getElementById('finalRank').textContent = prediction.title;
+            document.getElementById('rankDescription').textContent = prediction.description;
+        }
+        
+        function shareResult() {
+            const prediction = document.getElementById('finalRank').textContent;
+            const lives = gameState.lives;
+            const text = `Барсик предсказывает мне "${prediction}" на 2026 год! Я сохранил ${lives} из 9 жизней в игре "Барсик на Ёлке". А ты сможешь? Пройди по ссылке: ${window.location.href}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Барсик на Ёлке: 9 жизней до праздника',
+                    text: text,
+                    url: window.location.href
+                });
+            } else {
+                // Копируем в буфер обмена
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Результат скопирован в буфер обмена! Поделитесь им в соцсетях.');
+                });
+            }
+        }
+        
+        function playAgain() {
+            showScreen('start');
+        }
+        
+        // Инициализация игры при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLivesDisplay();
+        });
+    </script>
+</body>
+</html>
